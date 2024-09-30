@@ -3,4 +3,5 @@ project(infocod C)
 
 set(CMAKE_C_STANDARD 17)
 
-add_executable(infocod main.c)
+add_executable(infocod main.c
+        avl_tree.h)
