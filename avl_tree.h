@@ -8,23 +8,20 @@ struct Node {
     unsigned long hash;
     struct Node *pLeft;
     struct Node *pRight;
-    int height;
+    unsigned long height;
 };
 typedef struct Node Node;
 
-int get_height(struct Node *n) {
+long get_height(struct Node *n) {
     return NULL == n ? 0 : n->height;
 }
 
-int max(int a, int b) {
+long max(long a, long b) {
     return (a > b) ? a : b;
 }
 
-int get_balance_factor(struct Node *n) {
-    if (n == NULL) {
-        return 0;
-    }
-    return get_height(n->pLeft) - get_height(n->pRight);
+long get_balance_factor(struct Node *n) {
+    return (n == NULL) ? 0 : get_height(n->pLeft) - get_height(n->pRight);
 }
 
 struct Node *right_rotate(struct Node *y) {
@@ -77,7 +74,7 @@ struct Node *insert(struct Node *node, void *data, unsigned long hash) {
     }
 
     node->height = 1 + max(get_height(node->pLeft), get_height(node->pRight));
-    int bf = get_balance_factor(node);
+    long bf = get_balance_factor(node);
 
     if (bf > 1 && hash < node->pLeft->hash) {
         return right_rotate(node);
@@ -96,7 +93,7 @@ struct Node *insert(struct Node *node, void *data, unsigned long hash) {
     return node;
 }
 
-Node *search(struct Node *node, unsigned long hash) {
+struct Node *search(struct Node *node, unsigned long hash) {
     if (NULL == node) return NULL;
 
     if (node->hash == hash) {

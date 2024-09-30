@@ -12,7 +12,7 @@
 //#define DEBUG
 
 struct NodeData {
-    unsigned int container_id;
+    unsigned long container_id;
     char *string;
 };
 typedef struct NodeData NodeData;
@@ -21,7 +21,7 @@ unsigned long hash_function(const char *str) {
     assert(NULL != str);
 
     unsigned long i = 0;
-    for (int j = 0; str[j]; j++) {
+    for (unsigned long j = 0; str[j]; j++) {
         i += str[j];
     }
 
@@ -52,17 +52,17 @@ int main(void) {
     struct NodeData preparedStrings[NUMBER_OF_STRINGS] = {};
     struct Node *root = NULL;
 
-    for (int i = 0; i < NUMBER_OF_STRINGS; ++i) {
+    for (unsigned long i = 0; i < NUMBER_OF_STRINGS; ++i) {
         preparedStrings[i].string = strings[i];
         preparedStrings[i].container_id = rand() % NUMBER_OD_CONTAINERS;
 
         root = insert(root, &preparedStrings[i], hash_function(strings[i]));
     }
 
-    for (int container_number = 0; container_number < NUMBER_OD_CONTAINERS; ++container_number) {
-        printf("Container № %d  - [ ", container_number);
+    for (unsigned long container_number = 0; container_number < NUMBER_OD_CONTAINERS; ++container_number) {
+        printf("Container № %zu  - [ ", container_number);
         for (int j = 0; j < NUMBER_OF_STRINGS; ++j) {
-            unsigned int id = preparedStrings[j].container_id;
+            unsigned long id = preparedStrings[j].container_id;
             if (id == container_number) {
                 printf("%s, ", preparedStrings[j].string);
             }
@@ -102,6 +102,6 @@ int main(void) {
             continue;
         }
 
-        printf("The entered string is in container №: %u\n", pData->container_id);
+        printf("The entered string is in container №: %zu\n", pData->container_id);
     }
 }
