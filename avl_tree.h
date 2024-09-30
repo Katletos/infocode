@@ -1,20 +1,18 @@
 #ifndef INFOCOD_AVL_TREE_H
 #define INFOCOD_AVL_TREE_H
 
-#include <stddef.h>
 #include <malloc.h>
-#include <stdbool.h>
 
 struct Node {
-    void *data;
+    void *pData;
     unsigned long hash;
-    struct Node *left;
-    struct Node *right;
+    struct Node *pLeft;
+    struct Node *pRight;
     int height;
 };
 typedef struct Node Node;
 
-int getHeight(struct Node *n) {
+int get_height(struct Node *n) {
     return NULL == n ? 0 : n->height;
 }
 
@@ -22,94 +20,94 @@ int max(int a, int b) {
     return (a > b) ? a : b;
 }
 
-int getBalanceFactor(struct Node *n) {
+int get_balance_factor(struct Node *n) {
     if (n == NULL) {
         return 0;
     }
-    return getHeight(n->left) - getHeight(n->right);
+    return get_height(n->pLeft) - get_height(n->pRight);
 }
 
-struct Node *rightRotate(struct Node *y) {
-    struct Node *x = y->left;
-    struct Node *T2 = x->right;
+struct Node *right_rotate(struct Node *y) {
+    struct Node *x = y->pLeft;
+    struct Node *T2 = x->pRight;
 
-    x->right = y;
-    y->left = T2;
+    x->pRight = y;
+    y->pLeft = T2;
 
-    x->height = max(getHeight(x->right), getHeight(x->left)) + 1;
-    y->height = max(getHeight(y->right), getHeight(y->left)) + 1;
+    x->height = max(get_height(x->pRight), get_height(x->pLeft)) + 1;
+    y->height = max(get_height(y->pRight), get_height(y->pLeft)) + 1;
 
     return x;
 }
 
-struct Node *leftRotate(struct Node *x) {
-    struct Node *y = x->right;
-    struct Node *T2 = y->left;
+struct Node *left_rotate(struct Node *x) {
+    struct Node *y = x->pRight;
+    struct Node *T2 = y->pLeft;
 
-    y->left = x;
-    x->right = T2;
+    y->pLeft = x;
+    x->pRight = T2;
 
-    x->height = max(getHeight(x->right), getHeight(x->left)) + 1;
-    y->height = max(getHeight(y->right), getHeight(y->left)) + 1;
+    x->height = max(get_height(x->pRight), get_height(x->pLeft)) + 1;
+    y->height = max(get_height(y->pRight), get_height(y->pLeft)) + 1;
 
     return y;
 }
 
-struct Node *createNode(struct NodeData *data, unsigned long hash) {
+struct Node *create_node(void *data, unsigned long hash) {
     struct Node *node = (struct Node *) malloc(sizeof(struct Node));
-    node->data = data;
+    node->pData = data;
     node->hash = hash;
-    node->left = NULL;
-    node->right = NULL;
+    node->pLeft = NULL;
+    node->pRight = NULL;
     node->height = 1;
     return node;
 }
 
 struct Node *insert(struct Node *node, void *data, unsigned long hash) {
     if (NULL == node) {
-        return createNode(data, hash);
+        return create_node(data, hash);
     }
 
     if (hash < node->hash) {
-        node->left = insert(node->left, data, hash);
+        node->pLeft = insert(node->pLeft, data, hash);
     } else if (hash > node->hash) {
-        node->right = insert(node->right, data, hash);
+        node->pRight = insert(node->pRight, data, hash);
     } else {
         return node;
     }
 
-    node->height = 1 + max(getHeight(node->left), getHeight(node->right));
-    int bf = getBalanceFactor(node);
+    node->height = 1 + max(get_height(node->pLeft), get_height(node->pRight));
+    int bf = get_balance_factor(node);
 
-    if (bf > 1 && hash < node->left->hash) {
-        return rightRotate(node);
+    if (bf > 1 && hash < node->pLeft->hash) {
+        return right_rotate(node);
     }
-    if (bf < -1 && hash > node->right->hash) {
-        return leftRotate(node);
+    if (bf < -1 && hash > node->pRight->hash) {
+        return left_rotate(node);
     }
-    if (bf > 1 && hash > node->left->hash) {
-        node->left = leftRotate(node->left);
-        return rightRotate(node);
+    if (bf > 1 && hash > node->pLeft->hash) {
+        node->pLeft = left_rotate(node->pLeft);
+        return right_rotate(node);
     }
-    if (bf < -1 && hash < node->right->hash) {
-        node->right = rightRotate(node->right);
-        return leftRotate(node);
+    if (bf < -1 && hash < node->pRight->hash) {
+        node->pRight = right_rotate(node->pRight);
+        return left_rotate(node);
     }
     return node;
 }
 
-bool search(struct Node *node, unsigned long hash) {
-    if (NULL == node) return false;
+Node *search(struct Node *node, unsigned long hash) {
+    if (NULL == node) return NULL;
 
     if (node->hash == hash) {
-        return true;
+        return node;
     } else if (node->hash < hash) {
-        search(node->right, hash);
+        search(node->pRight, hash);
     } else if (node->hash > hash) {
-        search(node->left, hash);
+        search(node->pLeft, hash);
+    } else {
+        return NULL;
     }
-
-    return false;
 }
 
 #endif //INFOCOD_AVL_TREE_H

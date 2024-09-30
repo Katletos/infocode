@@ -1,14 +1,19 @@
 #include <stdio.h>
-#include <strings.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
 #include <time.h>
+#include <string.h>
 #include "avl_tree.h"
+
+#define NUMBER_OF_STRINGS 6
+#define NUMBER_OD_CONTAINERS 3
+#define MAX_STRING_LENGTH 25
+//#define DEBUG
 
 struct NodeData {
     unsigned int container_id;
-    char *str;
+    char *string;
 };
 typedef struct NodeData NodeData;
 
@@ -23,32 +28,32 @@ unsigned long hash_function(const char *str) {
     return i;
 }
 
-void printInfo(struct NodeData *data) {
-    printf("%s ", data->str);
-    printf("%u \n", data->container_id);
+#ifdef DEBUG
+
+void print_info(struct NodeData *data) {
+    printf("string: %s; ", data->string);
+    printf("container:%u \n", data->container_id);
 }
 
-void printTreeInfo(struct Node *root) {
+void print_tree_info(struct Node *root) {
     if (root != NULL) {
-        printf("%lu ", root->hash);
-        printInfo(root->data);
-        printTreeInfo(root->left);
-        printTreeInfo(root->right);
+        printf("hash: %lu; ", root->hash);
+        print_info(root->pData);
+        print_tree_info(root->pLeft);
+        print_tree_info(root->pRight);
     }
 }
 
-#define NUMBER_OF_STRINGS 4
-#define NUMBER_OD_CONTAINERS 3
-#define MAX_STRING_LENGTH 25
+#endif
 
 int main(void) {
     srand(time(0));
-    char *strings[NUMBER_OF_STRINGS] = {"1", "mama", "31", "sdqweqwe"};
+    char *strings[NUMBER_OF_STRINGS] = {"new world", "hello", "meow", "git", "infocode", "linus torvalds"};
     struct NodeData preparedStrings[NUMBER_OF_STRINGS] = {};
     struct Node *root = NULL;
 
     for (int i = 0; i < NUMBER_OF_STRINGS; ++i) {
-        preparedStrings[i].str = strings[i];
+        preparedStrings[i].string = strings[i];
         preparedStrings[i].container_id = rand() % NUMBER_OD_CONTAINERS;
 
         root = insert(root, &preparedStrings[i], hash_function(strings[i]));
@@ -59,21 +64,44 @@ int main(void) {
         for (int j = 0; j < NUMBER_OF_STRINGS; ++j) {
             unsigned int id = preparedStrings[j].container_id;
             if (id == container_number) {
-                printf("%s, ", preparedStrings[j].str);
+                printf("%s, ", preparedStrings[j].string);
             }
         }
         puts(" ]");
     }
 
-//    printTreeInfo(root);
+#ifdef DEBUG
+    print_tree_info(root);
+#endif
 
     while (true) {
         printf("Enter string [0, %d]: ", MAX_STRING_LENGTH);
         char buf[MAX_STRING_LENGTH];
 
+        char *status = fgets(buf, sizeof(buf), stdin);
+        assert(status != NULL);
 
-        char *status = fgets(buf, MAX_STRING_LENGTH, stdin);
-        printf("%b\n", search(root, hash_function(buf)));
-        puts("\n");
+        size_t len = strlen(buf);
+        if (len > 0 && buf[len - 1] == '\n') {
+            buf[len - 1] = 0;
+        }
+
+#ifdef DEBUG
+        printf("Hash for input: %lu \n", hash_function(buf));
+#endif
+
+        Node *pNode = search(root, hash_function(buf));
+        if (NULL == pNode) {
+            puts("There is no such line");
+            continue;
+        }
+
+        NodeData *pData = pNode->pData;
+        if (NULL == pData) {
+            puts("There is no data =(");
+            continue;
+        }
+
+        printf("The entered string is in container №: %u\n", pData->container_id);
     }
 }
